@@ -103,6 +103,7 @@ if 'extra_income' in st.session_state.current_period:
 #         st.success(f"Category '{new_category}' added!")
 #     elif new_category in st.session_state.custom_categories:
 #         st.warning("Category already exists.")
+
 # Add Custom Categories Section
 st.header("Add Custom Categories")
 
@@ -118,6 +119,7 @@ if st.button("Add Category", key="add_category_button"):
     if new_category and new_category not in st.session_state.custom_categories:
         st.session_state.custom_categories.append(new_category)
         st.success(f"Category '{new_category}' added!")
+        st.experimental_rerun()
     elif new_category in st.session_state.custom_categories:
         st.warning("Category already exists.")
 
@@ -134,6 +136,7 @@ if st.session_state.custom_categories:
             if col2.button(f"Delete {category}", key=f"delete_{category}"):
                 st.session_state.custom_categories.remove(category)
                 st.success(f"Category '{category}' removed!")
+                st.experimental_rerun()
                 break  # Re-run the loop to update the list immediately
 
 # Add expense using custom categories
