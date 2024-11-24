@@ -74,12 +74,19 @@ st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
 # Section: Extras and Weekly Spending
 st.header("🛒 Weekly Extras")
 
-# Allow user to add extra income
-st.subheader("Add Extra Income (Optional)")
-extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
-total_extras = extra_income + st.session_state.current_period['extras']['Amount'].sum()
+# Add Extra Income (Optional) - Make sure to include the submit button in the form
+with st.form("add_extra_income"):
+    extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
+    submit_extra_income = st.form_submit_button("Add Extra Income")  # Added submit button
+    
+    if submit_extra_income:
+        st.session_state.current_period['extra_income'] = extra_income  # Save extra income
 
-# Allow user to add extra expenses
+# Show extra income if provided
+if 'extra_income' in st.session_state.current_period:
+    st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
+
+# Add new expense and categories
 with st.form("Add Expense"):
     date = st.date_input("Date")
     category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"] + list(st.session_state.current_period['custom_categories']))
