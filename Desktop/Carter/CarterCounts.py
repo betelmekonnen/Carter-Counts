@@ -51,11 +51,15 @@ st.header("📑 Fixed Monthly Expenses")
 fixed_expenses = {
     'Rent': st.number_input("Rent ($)", min_value=0.0, step=0.01),
     'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01),
-    'Insurance': st.number_input("Insurance ($)", min_value=0.0, step=0.01),
-    'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
-    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01),
+    'Car Insurance': st.number_input("Car Insurance ($)", min_value=0.0, step=0.01),  # Added Car Insurance
+    'Fidelity': st.number_input("Fidelity ($)", min_value=0.0, step=0.01),  # Added Fidelity
     'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01),
-    'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01)
+    'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
+    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),  # Added Groceries
+    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
+    'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
+    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
+    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01)
 }
 total_fixed_expenses = sum(fixed_expenses.values())
 st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
