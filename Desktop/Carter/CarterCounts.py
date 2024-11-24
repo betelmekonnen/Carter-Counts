@@ -1,8 +1,4 @@
-# Your Python code here
 
-
-
-# file: budgeting_app.py
 
 import streamlit as st
 import pandas as pd
