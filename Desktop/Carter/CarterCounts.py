@@ -1,9 +1,17 @@
 import streamlit as st
 import pandas as pd
+import os
+
+# File where biweekly data will be saved
+CSV_FILE = 'biweekly_data.csv'
 
 # Initialize session state
 if 'biweekly_data' not in st.session_state:
-    st.session_state.biweekly_data = []
+# Check if the CSV file exists and load it
+    if os.path.exists(CSV_FILE):
+        st.session_state.biweekly_data = pd.read_csv(CSV_FILE).to_dict(orient='records')  # Load saved data into session_state
+    else:
+        st.session_state.biweekly_data = []
 
 if 'current_period' not in st.session_state:
     st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
@@ -205,9 +213,22 @@ else:
 
 # Save Period
 if st.button("Save Period"):
-    st.session_state.biweekly_data.append(st.session_state.current_period)
+    # Save the current period to CSV file
+    current_period = {
+        'income': st.session_state.current_period['income'],
+        'expenses': st.session_state.current_period['expenses'],
+        'extras': st.session_state.current_period['extras'].to_dict(orient='records')  # Convert dataframe to list of dicts
+    }
+    
+    # Append to CSV file (if CSV exists, append; else, create new CSV)
+    current_data = pd.read_csv(CSV_FILE) if os.path.exists(CSV_FILE) else pd.DataFrame()
+    current_data = current_data.append(pd.DataFrame([current_period]), ignore_index=True)
+    current_data.to_csv(CSV_FILE, index=False)
+    
+    # Reset current period
     st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
     st.success("Biweekly period saved!")
+
 
 # Show all saved periods
 st.header("📆 All Biweekly Periods")
