@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import pandas as pd
 
@@ -34,6 +32,11 @@ st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
 st.write(f"**Monthly Total**: ${monthly_total:.2f}")
 st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
+# Savings breakdown visualization
+savings_amount = biweekly_total * (savings_percent / 100)
+st.write(f"**Savings at {savings_percent}%**: ${savings_amount:.2f}")
+st.write(f"**Remaining after Savings**: ${biweekly_total - savings_amount:.2f}")
+
 # Save Income Details
 st.session_state.current_period['income'] = {
     'biweekly_net': biweekly_net,
@@ -60,13 +63,26 @@ st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 # Save Expenses
 st.session_state.current_period['expenses'] = fixed_expenses
 
+# Section: Disposable Income Calculation
+disposable_income_monthly = post_tax_savings - total_fixed_expenses
+disposable_income_biweekly = disposable_income_monthly / 2
+
+st.write(f"**Monthly Disposable Income after Expenses**: ${disposable_income_monthly:.2f}")
+st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
+
+
 # Section: Extras and Weekly Spending
 st.header("🛒 Weekly Extras")
 
-# Add new expense
+# Allow user to add extra income
+st.subheader("Add Extra Income (Optional)")
+extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
+total_extras = extra_income + st.session_state.current_period['extras']['Amount'].sum()
+
+# Allow user to add extra expenses
 with st.form("Add Expense"):
     date = st.date_input("Date")
-    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"])
+    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"] + list(st.session_state.current_period['custom_categories']))
     description = st.text_input("Description")
     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
     add_expense = st.form_submit_button("Add Expense")
@@ -109,4 +125,18 @@ if st.session_state.biweekly_data:
         st.write("**Expenses**", period['expenses'])
         st.write("**Extras**")
         st.dataframe(period['extras'])
+
+# Allow user to add custom categories
+st.header("Add Custom Categories")
+if 'custom_categories' not in st.session_state:
+    st.session_state.custom_categories = []
+
+new_category = st.text_input("New Category")
+if st.button("Add Category"):
+    if new_category and new_category not in st.session_state.custom_categories:
+        st.session_state.custom_categories.append(new_category)
+        st.success(f"Category '{new_category}' added!")
+    elif new_category in st.session_state.custom_categories:
+        st.warning("Category already exists.")
+
 
