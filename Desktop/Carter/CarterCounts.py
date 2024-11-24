@@ -91,18 +91,6 @@ with st.form("add_extra_income"):
 if 'extra_income' in st.session_state.current_period:
     st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
 
-# # Add Custom Categories
-# st.header("Add Custom Categories")
-# if 'custom_categories' not in st.session_state:
-#     st.session_state.custom_categories = []
-
-# new_category = st.text_input("New Category", key="new_category_input")
-# if st.button("Add Category", key="add_category_button"):
-#     if new_category and new_category not in st.session_state.custom_categories:
-#         st.session_state.custom_categories.append(new_category)
-#         st.success(f"Category '{new_category}' added!")
-#     elif new_category in st.session_state.custom_categories:
-#         st.warning("Category already exists.")
 
 # Add Custom Categories Section
 st.header("Add Custom Categories")
@@ -189,20 +177,6 @@ with st.form("Add Expense 2"):  # Use a different unique form key
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
         st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
 
-
-# # Add Expense
-# with st.form("Add Expense"):
-#     date = st.date_input("Date")
-#     # Combine predefined categories with custom categories
-#     all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-#     category = st.selectbox("Category", all_categories)
-#     description = st.text_input("Description")
-#     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
-#     add_expense = st.form_submit_button("Add Expense")
-    
-#     if add_expense:
-#         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-#         st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
 
 # Show expense table
 st.subheader("Extras This Period")
