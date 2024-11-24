@@ -105,7 +105,7 @@ st.header("🛒 Weekly Extras")
 # Add new expense
 with st.form("Add Expense"):
     date = st.date_input("Date")
-    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"])+ list(st.session_state.current_period['custom_categories']))
+    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"])
     description = st.text_input("Description")
     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
     add_expense = st.form_submit_button("Add Expense")
@@ -113,6 +113,7 @@ with st.form("Add Expense"):
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
         st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
+        
 # Show expense table
 st.subheader("Extras This Period")
 extras_df = st.session_state.current_period['extras']
