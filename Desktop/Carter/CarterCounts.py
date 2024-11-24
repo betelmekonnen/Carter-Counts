@@ -78,22 +78,34 @@ st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
 # Section: Extras and Weekly Spending
 st.header("🛒 Weekly Extras")
 
-# Add Extra Income (Optional) - Make sure to include the submit button in the form
-with st.form("add_extra_income"):
-    extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
-    submit_extra_income = st.form_submit_button("Add Extra Income")  # Added submit button
+# # Add Extra Income (Optional) - Make sure to include the submit button in the form
+# with st.form("add_extra_income"):
+#     extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
+#     submit_extra_income = st.form_submit_button("Add Extra Income")  # Added submit button
     
-    if submit_extra_income:
-        st.session_state.current_period['extra_income'] = extra_income  # Save extra income
+#     if submit_extra_income:
+#         st.session_state.current_period['extra_income'] = extra_income  # Save extra income
 
-# Show extra income if provided
-if 'extra_income' in st.session_state.current_period:
-    st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
+# # Show extra income if provided
+# if 'extra_income' in st.session_state.current_period:
+#     st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
 
-# Add new expense and categories
+# # Add new expense and categories
+# with st.form("Add Expense"):
+#     date = st.date_input("Date")
+#     category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"] + list(st.session_state.current_period['custom_categories']))
+#     description = st.text_input("Description")
+#     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
+#     add_expense = st.form_submit_button("Add Expense")
+    
+#     if add_expense:
+#         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
+#         st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
+
+# Add new expense
 with st.form("Add Expense"):
     date = st.date_input("Date")
-    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"] + list(st.session_state.current_period['custom_categories']))
+    category = st.selectbox("Category", ["Outing", "Gift", "Drinks", "Misc"])
     description = st.text_input("Description")
     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
     add_expense = st.form_submit_button("Add Expense")
@@ -101,7 +113,6 @@ with st.form("Add Expense"):
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
         st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
-
 # Show expense table
 st.subheader("Extras This Period")
 extras_df = st.session_state.current_period['extras']
