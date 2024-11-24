@@ -64,9 +64,6 @@ fixed_expenses = {
 total_fixed_expenses = sum(fixed_expenses.values())
 st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 
-remaining_after_expenses = post_tax_savings - total_fixed_expenses - total_extras
-st.write(f"**Remaining Funds after Expenses & Extras**: ${remaining_after_expenses:.2f}")
-
 # Save Expenses
 st.session_state.current_period['expenses'] = fixed_expenses
 
@@ -85,14 +82,27 @@ st.header("🛒 Weekly Extras")
 # Add Extra Income (Optional)
 with st.form("add_extra_income"):
     extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
-    submit_extra_income = st.form_submit_button("Add Extra Income")
+    submit_extra_income = st.form_submit_button("Add Extra Income")  # Submit button for extra income
     
     if submit_extra_income:
-        st.session_state.current_period['extra_income'] = extra_income  
+        st.session_state.current_period['extra_income'] = extra_income  # Save extra income
         
 # Show extra income if provided
 if 'extra_income' in st.session_state.current_period:
     st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
+
+# # Add Custom Categories
+# st.header("Add Custom Categories")
+# if 'custom_categories' not in st.session_state:
+#     st.session_state.custom_categories = []
+
+# new_category = st.text_input("New Category", key="new_category_input")
+# if st.button("Add Category", key="add_category_button"):
+#     if new_category and new_category not in st.session_state.custom_categories:
+#         st.session_state.custom_categories.append(new_category)
+#         st.success(f"Category '{new_category}' added!")
+#     elif new_category in st.session_state.custom_categories:
+#         st.warning("Category already exists.")
 
 # Add Custom Categories Section
 st.header("Add Custom Categories")
@@ -133,7 +143,11 @@ if st.session_state.custom_categories:
 st.header("Add Expense")
 with st.form("Add Expense"):
     date = st.date_input("Date")
+    
+    # Combine predefined categories with custom categories
     all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
+    
+    # Category selection (dropdown)
     category = st.selectbox("Category", all_categories)
     description = st.text_input("Description")
     amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
@@ -141,9 +155,8 @@ with st.form("Add Expense"):
     
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        new_entry_df = pd.DataFrame([new_entry])
-        st.session_state.current_period['extras'] = pd.concat([st.session_state.current_period['extras'], new_entry_df], ignore_index=True)
-
+        # Assuming you're appending the expense to the session_state's extras dataframe
+        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
 
 # Show the expense table with extras
 st.subheader("Extras This Period")
@@ -206,7 +219,6 @@ st.dataframe(extras_df)
 total_extras = extras_df['Amount'].sum()
 st.write(f"**Total Extras Spending**: ${total_extras:.2f}")
 
-
 # Biweekly Limit Check
 biweekly_limit = st.number_input("Set Biweekly Extras Limit ($)", min_value=0.0, step=0.01, value=200.0)
 remaining_after_expenses = post_tax_savings - total_fixed_expenses - total_extras
@@ -233,4 +245,16 @@ if st.session_state.biweekly_data:
         st.write("**Extras**")
         st.dataframe(period['extras'])
 
+# # Allow user to add custom categories
+# st.header("Add Custom Categories")
+# if 'custom_categories' not in st.session_state:
+#     st.session_state.custom_categories = []
+
+# new_category = st.text_input("New Category")
+# if st.button("Add Category"):
+#     if new_category and new_category not in st.session_state.custom_categories:
+#         st.session_state.custom_categories.append(new_category)
+#         st.success(f"Category '{new_category}' added!")
+#     elif new_category in st.session_state.custom_categories:
+#         st.warning("Category already exists.")
 
