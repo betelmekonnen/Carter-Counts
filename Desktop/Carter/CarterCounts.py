@@ -51,14 +51,14 @@ st.header("📑 Fixed Monthly Expenses")
 fixed_expenses = {
     'Rent': st.number_input("Rent ($)", min_value=0.0, step=0.01),
     'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01),
-    'Car Insurance': st.number_input("Car Insurance ($)", min_value=0.0, step=0.01),  # Added Car Insurance
-    'Fidelity': st.number_input("Fidelity ($)", min_value=0.0, step=0.01),  # Added Fidelity
+    'Car Insurance': st.number_input("Car Insurance ($)", min_value=0.0, step=0.01),
+    'Fidelity': st.number_input("Fidelity ($)", min_value=0.0, step=0.01),
     'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01),
     'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
-    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),  # Added Groceries
-    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
+    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),
+    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),
     'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
-    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
+    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),
     'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01)
 }
 total_fixed_expenses = sum(fixed_expenses.values())
@@ -143,48 +143,11 @@ with st.form("Add Expense"):
     
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        # Assuming you're appending the expense to the session_state's extras dataframe
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
+        # Replace .append() with pd.concat to add entry to DataFrame
+        new_entry_df = pd.DataFrame([new_entry])
+        st.session_state.current_period['extras'] = pd.concat([st.session_state.current_period['extras'], new_entry_df], ignore_index=True)
 
 # Show the expense table with extras
-st.subheader("Extras This Period")
-extras_df = st.session_state.current_period['extras']
-st.dataframe(extras_df)
-
-# First Add Expense Form
-with st.form("Add Expense 1"):  # Use a unique form key
-    date = st.date_input("Date")
-    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-    category = st.selectbox("Category", all_categories)
-    description = st.text_input("Description")
-    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
-    add_expense = st.form_submit_button("Add Expense")
-    
-    if add_expense:
-        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
-
-# Second Add Expense Form (if necessary)
-with st.form("Add Expense 2"):  # Use a different unique form key
-    date = st.date_input("Date")
-    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-    category = st.selectbox("Category", all_categories)
-    description = st.text_input("Description")
-    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
-    add_expense = st.form_submit_button("Add Expense")
-    
-    if add_expense:
-        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
-
-
-# Show expense table
-st.subheader("Extras This Period")
-extras_df = st.session_state.current_period['extras']
-st.dataframe(extras_df)
-
-
-# Show expense table
 st.subheader("Extras This Period")
 extras_df = st.session_state.current_period['extras']
 st.dataframe(extras_df)
@@ -199,36 +162,4 @@ remaining_after_expenses = post_tax_savings - total_fixed_expenses - total_extra
 st.write(f"**Remaining Funds after Expenses & Extras**: ${remaining_after_expenses:.2f}")
 
 if total_extras > biweekly_limit:
-    st.error(f"⚠️ You've exceeded your biweekly limit by ${total_extras - biweekly_limit:.2f}")
-else:
-    st.success(f"🎉 You're under your limit by ${biweekly_limit - total_extras:.2f}")
-
-# Save Period
-if st.button("Save Period"):
-    st.session_state.biweekly_data.append(st.session_state.current_period)
-    st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
-    st.success("Biweekly period saved!")
-
-# Show all saved periods
-st.header("📆 All Biweekly Periods")
-if st.session_state.biweekly_data:
-    for i, period in enumerate(st.session_state.biweekly_data):
-        st.subheader(f"Biweekly Period {i + 1}")
-        st.write("**Income**", period['income'])
-        st.write("**Expenses**", period['expenses'])
-        st.write("**Extras**")
-        st.dataframe(period['extras'])
-
-# # Allow user to add custom categories
-# st.header("Add Custom Categories")
-# if 'custom_categories' not in st.session_state:
-#     st.session_state.custom_categories = []
-
-# new_category = st.text_input("New Category")
-# if st.button("Add Category"):
-#     if new_category and new_category not in st.session_state.custom_categories:
-#         st.session_state.custom_categories.append(new_category)
-#         st.success(f"Category '{new_category}' added!")
-#     elif new_category in st.session_state.custom_categories:
-#         st.warning("Category already exists.")
-
+    st.error(f"⚠
