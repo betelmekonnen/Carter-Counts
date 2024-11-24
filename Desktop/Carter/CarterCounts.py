@@ -91,18 +91,75 @@ with st.form("add_extra_income"):
 if 'extra_income' in st.session_state.current_period:
     st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
 
-# Add Custom Categories
+# # Add Custom Categories
+# st.header("Add Custom Categories")
+# if 'custom_categories' not in st.session_state:
+#     st.session_state.custom_categories = []
+
+# new_category = st.text_input("New Category", key="new_category_input")
+# if st.button("Add Category", key="add_category_button"):
+#     if new_category and new_category not in st.session_state.custom_categories:
+#         st.session_state.custom_categories.append(new_category)
+#         st.success(f"Category '{new_category}' added!")
+#     elif new_category in st.session_state.custom_categories:
+#         st.warning("Category already exists.")
+# Add Custom Categories Section
 st.header("Add Custom Categories")
+
+# Initialize session state for custom categories if it doesn't exist yet
 if 'custom_categories' not in st.session_state:
     st.session_state.custom_categories = []
 
+# Input field for a new category
 new_category = st.text_input("New Category", key="new_category_input")
+
+# Button to add the new category to the list
 if st.button("Add Category", key="add_category_button"):
     if new_category and new_category not in st.session_state.custom_categories:
         st.session_state.custom_categories.append(new_category)
         st.success(f"Category '{new_category}' added!")
     elif new_category in st.session_state.custom_categories:
         st.warning("Category already exists.")
+
+# Show the list of custom categories
+st.subheader("Current Custom Categories")
+if st.session_state.custom_categories:
+    # Display the custom categories with delete option
+    for category in st.session_state.custom_categories:
+        category_row = st.container()
+        with category_row:
+            col1, col2 = st.columns([4, 1])
+            col1.write(category)
+            # Button to delete the category
+            if col2.button(f"Delete {category}", key=f"delete_{category}"):
+                st.session_state.custom_categories.remove(category)
+                st.success(f"Category '{category}' removed!")
+                break  # Re-run the loop to update the list immediately
+
+# Add expense using custom categories
+st.header("Add Expense")
+with st.form("Add Expense"):
+    date = st.date_input("Date")
+    
+    # Combine predefined categories with custom categories
+    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
+    
+    # Category selection (dropdown)
+    category = st.selectbox("Category", all_categories)
+    description = st.text_input("Description")
+    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
+    add_expense = st.form_submit_button("Add Expense")
+    
+    if add_expense:
+        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
+        # Assuming you're appending the expense to the session_state's extras dataframe
+        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
+
+# Show the expense table with extras
+st.subheader("Extras This Period")
+extras_df = st.session_state.current_period['extras']
+st.dataframe(extras_df)
+
 
 # Add Expense
 with st.form("Add Expense"):
