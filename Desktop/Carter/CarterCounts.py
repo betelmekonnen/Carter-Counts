@@ -216,17 +216,17 @@ if st.session_state.biweekly_data:
         st.write("**Extras**")
         st.dataframe(period['extras'])
 
-# Allow user to add custom categories
-st.header("Add Custom Categories")
-if 'custom_categories' not in st.session_state:
-    st.session_state.custom_categories = []
+# # Allow user to add custom categories
+# st.header("Add Custom Categories")
+# if 'custom_categories' not in st.session_state:
+#     st.session_state.custom_categories = []
 
-new_category = st.text_input("New Category")
-if st.button("Add Category"):
-    if new_category and new_category not in st.session_state.custom_categories:
-        st.session_state.custom_categories.append(new_category)
-        st.success(f"Category '{new_category}' added!")
-    elif new_category in st.session_state.custom_categories:
-        st.warning("Category already exists.")
+# new_category = st.text_input("New Category")
+# if st.button("Add Category"):
+#     if new_category and new_category not in st.session_state.custom_categories:
+#         st.session_state.custom_categories.append(new_category)
+#         st.success(f"Category '{new_category}' added!")
+#     elif new_category in st.session_state.custom_categories:
+#         st.warning("Category already exists.")
 
 
