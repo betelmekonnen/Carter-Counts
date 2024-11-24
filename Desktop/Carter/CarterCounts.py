@@ -96,8 +96,8 @@ st.header("Add Custom Categories")
 if 'custom_categories' not in st.session_state:
     st.session_state.custom_categories = []
 
-new_category = st.text_input("New Category")
-if st.button("Add Category"):
+new_category = st.text_input("New Category", key="new_category_input")
+if st.button("Add Category", key="add_category_button"):
     if new_category and new_category not in st.session_state.custom_categories:
         st.session_state.custom_categories.append(new_category)
         st.success(f"Category '{new_category}' added!")
