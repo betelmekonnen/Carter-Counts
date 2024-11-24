@@ -11,7 +11,7 @@ if 'current_period' not in st.session_state:
     st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
 
 # Title
-st.title("Christmas Budgeting App 🎄")
+st.title("Carter Counts!")
 
 # Section: Income Input
 st.header("💰 Income Details")
