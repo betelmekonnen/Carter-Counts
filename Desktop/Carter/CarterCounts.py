@@ -169,11 +169,15 @@ if st.button("Save Period"):
     if not income or not expenses or extras.empty:
         st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.")
     else:
-        # Ensure 'extras' is serialized correctly as a list of dictionaries
+        # Ensure all columns in 'extras' are serializable
+        # Convert the 'Date' column to string (ISO format)
+        extras_serializable = extras.copy()
+        extras_serializable['Date'] = extras_serializable['Date'].apply(lambda x: x.isoformat() if isinstance(x, pd.Timestamp) else str(x))
+
         current_period = {
             'income': json.dumps(income),
             'expenses': json.dumps(expenses),
-            'extras': json.dumps(extras.to_dict(orient='records'))  # Convert DataFrame to list of dictionaries
+            'extras': json.dumps(extras_serializable.to_dict(orient='records'))  # Convert DataFrame to list of dictionaries
         }
 
         if st.session_state.edit_index is not None:  # Editing existing period
