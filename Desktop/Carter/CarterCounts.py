@@ -202,43 +202,6 @@ if st.button("Save Period"):
             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
         }
 
-
-# # Save Period with Validation
-# if st.button("Save Period"):
-#     income = st.session_state.current_period['income']
-#     expenses = st.session_state.current_period['expenses']
-#     extras = st.session_state.current_period['extras']
-
-#     if not income or not expenses or extras.empty:
-#         st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.", icon="🚨")
-#     else:
-#         current_period = {
-#             'income': json.dumps(income),
-#             'expenses': json.dumps(expenses),
-#             'extras': json.dumps(extras.to_dict(orient='records'))
-#         }
-
-#         if st.session_state.edit_index is not None:  # Editing existing period
-#             st.session_state.biweekly_data[st.session_state.edit_index] = current_period
-#             st.session_state.edit_index = None
-#             st.success("Period updated successfully!")
-#         else:  # Adding new period
-#             st.session_state.biweekly_data.append(current_period)
-#             st.success("New period saved!")
-
-#         # Save to CSV
-#         try:
-#             pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-#         except Exception as e:
-#             st.error(f"Error saving data: {e}", icon="🚨")
-
-#         # Reset current period
-#         st.session_state.current_period = {
-#             'income': {}, 
-#             'expenses': {}, 
-#             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
-#         }
-
 # Show All Saved Periods
 st.header("📆 All Biweekly Periods")
 if st.session_state.biweekly_data:
@@ -294,6 +257,3 @@ if st.button("Clear All Data"):
     if os.path.exists(CSV_FILE):
         os.remove(CSV_FILE)
     st.success("All data cleared successfully!", icon="✅")
-
-st.subheader("📝 Biweekly Expenses Summary")
-st.table(extras_df)
