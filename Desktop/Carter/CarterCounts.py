@@ -36,7 +36,7 @@ if 'edit_index' not in st.session_state:
     st.session_state.edit_index = None
 
 # Title
-st.title("Carter Counts🧮!")
+st.title("🧮Carter Counts!")
 
 # Export/Import Section
 st.subheader("📤 Export/📥 Import Data")
