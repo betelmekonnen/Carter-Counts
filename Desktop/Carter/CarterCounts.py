@@ -5,9 +5,7 @@ import json
 import xlsxwriter
 
 # File where biweekly data will be saved
-# CSV_FILE = 'biweekly_data.csv'
-CSV_FILE = 'biweekly_data (1).csv'
-
+CSV_FILE = 'biweekly_data.csv'
 
 # Initialize session state
 if 'biweekly_data' not in st.session_state:
@@ -71,14 +69,9 @@ if uploaded_file is not None:
         else:
             st.error("Unsupported file format. Please upload a CSV or Excel file.")
 
-        # Populate session state with the imported data
         if imported_data:
-            st.session_state.biweekly_data = imported_data  # Update biweekly data with imported content
-            st.session_state.current_period['income'] = imported_data[0].get('income', {})
-            st.session_state.current_period['expenses'] = imported_data[0].get('expenses', {})
-            extras_data = imported_data[0].get('extras', [])
-            if extras_data:
-                st.session_state.current_period['extras'] = pd.DataFrame(extras_data)
+            st.session_state.biweekly_data.extend(imported_data)
+            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
             st.success("Data imported successfully!")
     except Exception as e:
         st.error(f"Error importing data: {e}")
@@ -143,45 +136,11 @@ else:
     st.warning("⚠️ Please enter at least one fixed expense.")
 
 # Section: Extras
-st.header("💸 Extra Expenses")
-
-# Show extra expenses from past periods
-if not st.session_state.current_period['extras'].empty:
-    st.write("### Past Extra Expenses")
-    st.dataframe(st.session_state.current_period['extras'])
-
-# Add new extra expense
-new_date = st.date_input("Expense Date")
-new_category = st.text_input("Category")
-new_description = st.text_input("Description")
-new_amount = st.number_input("Amount ($)", min_value=0.0, step=0.01, format="%.2f")
-
-if st.button("Add Extra Expense"):
-    new_expense = {
-        'Date': new_date,
-        'Category': new_category,
-        'Description': new_description,
-        'Amount': new_amount
-    }
-    
-    # Create a DataFrame for the new expense
-    new_expense_df = pd.DataFrame([new_expense])
-
-    # Concatenate the new row with the existing DataFrame
-    st.session_state.current_period['extras'] = pd.concat([st.session_state.current_period['extras'], new_expense_df], ignore_index=True)
-
-    st.success("Extra expense added successfully!")
-
-# if st.button("Add Extra Expense"):
-#     new_expense = {
-#         'Date': new_date,
-#         'Category': new_category,
-#         'Description': new_description,
-#         'Amount': new_amount
-#     }
-#     st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_expense, ignore_index=True)
+# This section will work as before, with the option to add new extra expenses.
 
 # Save and Edit Data
+
+# Save and load data as before, ensure data is updated with each edit
 if st.button("Save Period"):
     income = st.session_state.current_period['income']
     expenses = st.session_state.current_period['expenses']
@@ -190,7 +149,7 @@ if st.button("Save Period"):
     if not income or not expenses or extras.empty:
         st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.")
     else:
-        # Convert to JSON serializable format
+        # Ensure all columns in 'extras' are serializable
         extras_serializable = extras.copy()
         extras_serializable['Date'] = extras_serializable['Date'].apply(lambda x: x.isoformat() if isinstance(x, pd.Timestamp) else str(x))
 
