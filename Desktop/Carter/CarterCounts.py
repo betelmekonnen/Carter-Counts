@@ -76,13 +76,6 @@ st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 st.session_state.current_period['expenses'] = fixed_expenses
 
 # Section: Disposable Income Calculation
-# disposable_income_monthly = post_tax_savings - total_fixed_expenses
-# disposable_income_biweekly = disposable_income_monthly / 2
-
-# st.write(f"**Monthly Disposable Income after Expenses**: ${disposable_income_monthly:.2f}")
-# st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
-
-# Calculate Monthly and Biweekly Disposable Income
 remaining_after_savings = biweekly_total - savings_amount  # Remaining after savings (biweekly)
 monthly_remaining_after_savings = remaining_after_savings * 2  # Convert to monthly
 disposable_income_monthly = monthly_remaining_after_savings - total_fixed_expenses  # Subtract fixed expenses
@@ -163,7 +156,13 @@ with st.form("Add Expense"):
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
         # Assuming you're appending the expense to the session_state's extras dataframe
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
+        new_row = pd.DataFrame([new_entry])  # Convert the new entry into a DataFrame
+        st.session_state.current_period['extras'] = pd.concat(
+            [st.session_state.current_period['extras'], new_row],
+            ignore_index=True
+        )
+        st.success("Expense added successfully!")
+
 
 # Show the expense table with extras
 st.subheader("Extras This Period")
@@ -181,8 +180,12 @@ with st.form("Add Expense 1"):  # Use a unique form key
     
     if add_expense:
         new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
-
+        new_row = pd.DataFrame([new_entry])
+        st.session_state.current_period['extras'] = pd.concat(
+            [st.session_state.current_period['extras'], new_row],
+            ignore_index=True
+        )
+        st.success("Expense added successfully!")
 # Second Add Expense Form (if necessary)
 with st.form("Add Expense 2"):  # Use a different unique form key
     date = st.date_input("Date")
