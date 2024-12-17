@@ -63,7 +63,6 @@ with col2:
         )
 
 # Import file
-st.subheader("Import Data")
 uploaded_file = st.file_uploader("Upload a CSV or Excel file to import data", type=["csv", "xlsx"])
 
 if uploaded_file is not None:
