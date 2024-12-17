@@ -76,12 +76,19 @@ st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 st.session_state.current_period['expenses'] = fixed_expenses
 
 # Section: Disposable Income Calculation
-disposable_income_monthly = post_tax_savings - total_fixed_expenses
+# disposable_income_monthly = post_tax_savings - total_fixed_expenses
+# disposable_income_biweekly = disposable_income_monthly / 2
+
+# st.write(f"**Monthly Disposable Income after Expenses**: ${disposable_income_monthly:.2f}")
+# st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
+
+# Correct calculation of disposable income
+monthly_post_tax_savings = post_tax_savings * 2  # Adjust for monthly funds
+disposable_income_monthly = monthly_post_tax_savings - total_fixed_expenses
 disposable_income_biweekly = disposable_income_monthly / 2
 
 st.write(f"**Monthly Disposable Income after Expenses**: ${disposable_income_monthly:.2f}")
 st.write(f"**Biweekly Disposable Income**: ${disposable_income_biweekly:.2f}")
-
 
 # Section: Extras and Weekly Spending
 st.header("🛒 Weekly Extras")
