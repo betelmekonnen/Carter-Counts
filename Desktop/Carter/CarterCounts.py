@@ -42,20 +42,26 @@ with col2:
     savings_percent = st.slider("Savings (%)", 0, 100, 10)
     tax_percent = st.slider("Tax (%)", 0, 100, 10)
 
-# Always display values and enforce consistent updates
+# Calculate totals
 biweekly_total = biweekly_net - biweekly_deductions
 monthly_total = biweekly_total * 2
-post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
 
+# Correct calculation: subtract taxes first, then savings
+after_tax_income = biweekly_total * (1 - tax_percent / 100)
+post_tax_savings = after_tax_income * (1 - savings_percent / 100)
+savings_amount = after_tax_income * (savings_percent / 100)
+
+# Display totals
 st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
 st.write(f"**Monthly Total**: ${monthly_total:.2f}")
-st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
+st.write(f"**After Tax Income**: ${after_tax_income:.2f}")
+st.write(f"**Available Funds after Savings**: ${post_tax_savings:.2f}")
 
 # Savings breakdown visualization
-savings_amount = biweekly_total * (savings_percent / 100)
-st.write(f"**Savings at {savings_percent}%**: ${savings_amount:.2f}")
-st.write(f"**Remaining after Savings**: ${biweekly_total - savings_amount:.2f}")
-# Always save updated values to session state
+st.write(f"**Savings at {savings_percent}% (After Tax)**: ${savings_amount:.2f}")
+st.write(f"**Remaining Funds after Savings**: ${after_tax_income - savings_amount:.2f}")
+
+# Save updated values to session state
 st.session_state.current_period['income'] = {
     'biweekly_net': biweekly_net,
     'biweekly_deductions': biweekly_deductions,
@@ -63,7 +69,6 @@ st.session_state.current_period['income'] = {
     'tax_percent': tax_percent,
     'post_tax_savings': post_tax_savings
 }
-
 
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
