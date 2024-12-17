@@ -75,14 +75,14 @@ if uploaded_file is not None:
         elif uploaded_file.name.endswith('.xlsx'):
             imported_data = pd.read_excel(uploaded_file).to_dict(orient='records')
         else:
-            st.error("Unsupported file format. Please upload a CSV or Excel file.")
+            st.error("Unsupported file format. Please upload a CSV or Excel file.", icon="🚨")
 
         if imported_data:
             st.session_state.biweekly_data.extend(imported_data)
             pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-            st.success("Data imported successfully!")
+            st.success("Data imported successfully!", icon="✅")
     except Exception as e:
-        st.error(f"Error importing data: {e}")
+        st.error(f"Error importing data: {e}", icon="🚨")
 
 # Section: Income Input
 st.header("💰 Income Details")
@@ -136,7 +136,7 @@ st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 if total_fixed_expenses > 0:
     st.session_state.current_period['expenses'] = fixed_expenses
 else:
-    st.warning("⚠️ Please enter at least one fixed expense.")
+    st.warning("⚠️ Please enter at least one fixed expense.",icon="⚠️")
 
 # Section: Extras Expenses
 st.header("🛒 Daily Expenses")
@@ -149,14 +149,14 @@ with st.form("Add Expense"):
 
     if add_expense:
         if not category or not description or amount <= 0:
-            st.error("⚠️ Please fill in all fields for Daily Expenses (Date, Category, Description, and Amount).")
+            st.error("⚠️ Please fill in all fields for Daily Expenses (Date, Category, Description, and Amount).", icon="🚨")
         else:
             new_row = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
             st.session_state.current_period['extras'] = pd.concat(
                 [st.session_state.current_period['extras'], pd.DataFrame([new_row])],
                 ignore_index=True
             )
-            st.success("Expense added successfully!")
+            st.success("Expense added successfully!", icon="✅")
 
 st.subheader("Daily Expenses This Period")
 st.dataframe(st.session_state.current_period['extras'])
@@ -168,7 +168,7 @@ if st.button("Save Period"):
     extras = st.session_state.current_period['extras']
 
     if not income or not expenses or extras.empty:
-        st.error("⚠️ Please ensure Income, Expenses, and at least one Daily expense are filled before saving.")
+        st.error("⚠️ Please ensure Income, Expenses, and at least one Daily expense are filled before saving.", icon="🚨")
     else:
         # Ensure all columns in 'extras' are serializable
         # Convert the 'Date' column to string (ISO format)
@@ -184,16 +184,16 @@ if st.button("Save Period"):
         if st.session_state.edit_index is not None:  # Editing existing period
             st.session_state.biweekly_data[st.session_state.edit_index] = current_period
             st.session_state.edit_index = None
-            st.success("Period updated successfully!")
+            st.success("Period updated successfully!", icon="✅")
         else:  # Adding new period
             st.session_state.biweekly_data.append(current_period)
-            st.success("New period saved!")
+            st.success("New period saved!", icon="✅")
 
         # Save to CSV
         try:
             pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
         except Exception as e:
-            st.error(f"Error saving data: {e}")
+            st.error(f"Error saving data: {e}", icon="🚨")
 
         # Reset current period
         st.session_state.current_period = {
@@ -210,7 +210,7 @@ if st.button("Save Period"):
 #     extras = st.session_state.current_period['extras']
 
 #     if not income or not expenses or extras.empty:
-#         st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.")
+#         st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.", icon="🚨")
 #     else:
 #         current_period = {
 #             'income': json.dumps(income),
@@ -230,7 +230,7 @@ if st.button("Save Period"):
 #         try:
 #             pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
 #         except Exception as e:
-#             st.error(f"Error saving data: {e}")
+#             st.error(f"Error saving data: {e}", icon="🚨")
 
 #         # Reset current period
 #         st.session_state.current_period = {
@@ -249,7 +249,7 @@ if st.session_state.biweekly_data:
             expenses = json.loads(period['expenses'])
             extras_df = pd.DataFrame(json.loads(period['extras']))
         except (json.JSONDecodeError, TypeError, ValueError):
-            st.error(f"Error loading data for Period {i + 1}. Skipping this period.")
+            st.error(f"Error loading data for Period {i + 1}. Skipping this period.", icon="🚨")
             continue
 
         st.write("**Income**", income)
@@ -273,16 +273,16 @@ if st.session_state.biweekly_data:
 
 # Confirmation Dialog for Deletion
 if st.session_state.delete_confirm is not None:
-    st.warning(f"Are you sure you want to delete Biweekly Period {st.session_state.delete_confirm + 1}?")
+    st.warning(f"Are you sure you want to delete Biweekly Period {st.session_state.delete_confirm + 1}?",icon="⚠️")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Yes, Delete"):
             st.session_state.biweekly_data.pop(st.session_state.delete_confirm)
             try:
                 pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-                st.success("Period deleted successfully!")
+                st.success("Period deleted successfully!", icon="✅")
             except Exception as e:
-                st.error(f"Error saving data: {e}")
+                st.error(f"Error saving data: {e}", icon="🚨")
             st.session_state.delete_confirm = None
 
     with col2:
@@ -293,4 +293,4 @@ if st.button("Clear All Data"):
     st.session_state.biweekly_data = []
     if os.path.exists(CSV_FILE):
         os.remove(CSV_FILE)
-    st.success("All data cleared successfully!")
+    st.success("All data cleared successfully!", icon="✅")
