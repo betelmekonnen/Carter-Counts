@@ -245,6 +245,16 @@ if st.button("Save Period"):
     st.success("Biweekly period saved!")
 
 
+# # Show all saved periods
+# st.header("📆 All Biweekly Periods")
+# if st.session_state.biweekly_data:
+#     for i, period in enumerate(st.session_state.biweekly_data):
+#         st.subheader(f"Biweekly Period {i + 1}")
+#         st.write("**Income**", period['income'])
+#         st.write("**Expenses**", period['expenses'])
+#         st.write("**Extras**")
+#         st.dataframe(period['extras'])
+
 # Show all saved periods
 st.header("📆 All Biweekly Periods")
 if st.session_state.biweekly_data:
@@ -252,6 +262,14 @@ if st.session_state.biweekly_data:
         st.subheader(f"Biweekly Period {i + 1}")
         st.write("**Income**", period['income'])
         st.write("**Expenses**", period['expenses'])
-        st.write("**Extras**")
-        st.dataframe(period['extras'])
+        
+        # Handle extras
+        if isinstance(period['extras'], list):
+            extras_df = pd.DataFrame(period['extras'])
+        elif isinstance(period['extras'], str):
+            extras_df = pd.DataFrame(eval(period['extras']))  # Convert string to DataFrame
+        else:
+            extras_df = period['extras']  # Assume already a DataFrame
 
+        st.write("**Extras**")
+        st.dataframe(extras_df)
