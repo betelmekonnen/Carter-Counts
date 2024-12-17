@@ -5,14 +5,40 @@ import json
 
 # File where biweekly data will be saved
 CSV_FILE = 'biweekly_data.csv'
+import os
+import pandas as pd
+import streamlit as st
+
+# File where biweekly data will be saved
+CSV_FILE = 'biweekly_data.csv'
 
 # Initialize session state
 if 'biweekly_data' not in st.session_state:
     if os.path.exists(CSV_FILE):
-        data = pd.read_csv(CSV_FILE)
-        st.session_state.biweekly_data = data.to_dict(orient='records')
+        try:
+            # Try loading the CSV
+            data = pd.read_csv(CSV_FILE)
+            st.session_state.biweekly_data = data.to_dict(orient='records')
+        except pd.errors.EmptyDataError:
+            # Handle empty CSV file: Create it with appropriate headers
+            st.warning("The CSV file was empty. Initializing with default structure.")
+            empty_df = pd.DataFrame(columns=["income", "expenses", "extras"])
+            empty_df.to_csv(CSV_FILE, index=False)
+            st.session_state.biweekly_data = []
     else:
+        # If the file doesn't exist, create it with appropriate headers
+        st.warning("CSV file not found. Creating a new one.")
+        empty_df = pd.DataFrame(columns=["income", "expenses", "extras"])
+        empty_df.to_csv(CSV_FILE, index=False)
         st.session_state.biweekly_data = []
+
+# # Initialize session state
+# if 'biweekly_data' not in st.session_state:
+#     if os.path.exists(CSV_FILE):
+#         data = pd.read_csv(CSV_FILE)
+#         st.session_state.biweekly_data = data.to_dict(orient='records')
+#     else:
+#         st.session_state.biweekly_data = []
 
 if 'current_period' not in st.session_state:
     st.session_state.current_period = {
