@@ -144,13 +144,6 @@ if st.button("Save Period"):
             'expenses': {}, 
             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
         }
-# Clear All Data Section
-st.write("Reset All Data")
-if st.button("Clear All Data"):
-    st.session_state.biweekly_data = []
-    if os.path.exists(CSV_FILE):
-        os.remove(CSV_FILE)
-    st.success("All data cleared successfully!")
 
 # Show All Saved Periods
 st.header("📆 All Biweekly Periods")
@@ -201,3 +194,10 @@ if st.session_state.delete_confirm is not None:
     with col2:
         if st.button("Cancel"):
             st.session_state.delete_confirm = None
+# Clear All Data Section
+st.write("Reset All Data")
+if st.button("Clear All Data"):
+    st.session_state.biweekly_data = []
+    if os.path.exists(CSV_FILE):
+        os.remove(CSV_FILE)
+    st.success("All data cleared successfully!")
