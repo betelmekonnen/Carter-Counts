@@ -236,7 +236,8 @@ if st.button("Save Period"):
     
     # Append to CSV file (if CSV exists, append; else, create new CSV)
     current_data = pd.read_csv(CSV_FILE) if os.path.exists(CSV_FILE) else pd.DataFrame()
-    current_data = current_data.append(pd.DataFrame([current_period]), ignore_index=True)
+    new_row = pd.DataFrame([current_period])  # Convert current_period into a DataFrame
+    current_data = pd.concat([current_data, new_row], ignore_index=True)
     current_data.to_csv(CSV_FILE, index=False)
     
     # Reset current period
