@@ -31,7 +31,7 @@ if 'edit_index' not in st.session_state:
 st.title("Carter Counts!")
 
 # Clear All Data Section
-st.header("Reset All Data")
+st.write("Reset All Data")
 if st.button("Clear All Data"):
     st.session_state.biweekly_data = []
     if os.path.exists(CSV_FILE):
