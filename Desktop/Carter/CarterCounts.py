@@ -145,7 +145,10 @@ if st.button("Save Period"):
             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
         }
         
+
+# Show All Saved Periods
 st.header("📆 All Biweekly Periods")
+
 if st.session_state.biweekly_data:
     for i, period in enumerate(st.session_state.biweekly_data):
         st.subheader(f"Biweekly Period {i + 1}")
@@ -175,11 +178,35 @@ if st.session_state.biweekly_data:
                     'extras': extras_df
                 }
                 st.session_state.edit_index = i
-                st.experimental_rerun()
+                # No rerun needed here, Streamlit will update UI naturally
+
         with col2:
             if st.button(f"Delete Period {i + 1}", key=f"delete_{i}"):
                 st.session_state.delete_confirm = i
-                st.experimental_rerun()
+                # No rerun here; let the confirmation section handle it
+
+# Confirmation Dialog for Deletion
+if st.session_state.delete_confirm is not None:
+    st.warning(f"Are you sure you want to delete Biweekly Period {st.session_state.delete_confirm + 1}?")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Yes, Delete"):
+            # Delete the selected period
+            st.session_state.biweekly_data.pop(st.session_state.delete_confirm)
+            # Save updated data
+            try:
+                pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+                st.success("Period deleted successfully!")
+            except Exception as e:
+                st.error(f"Error saving data: {e}")
+            # Reset delete confirmation
+            st.session_state.delete_confirm = None
+            # No rerun needed, Streamlit refreshes automatically
+
+    with col2:
+        if st.button("Cancel"):
+            # Reset delete confirmation
+            st.session_state.delete_confirm = None
 
 
 # Confirmation Dialog for Deletion
