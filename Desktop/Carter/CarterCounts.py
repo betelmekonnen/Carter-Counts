@@ -4,9 +4,9 @@ import os
 import json
 
 # File where biweekly data will be saved
-# CSV_FILE = 'biweekly_data.csv'
+CSV_FILE = 'biweekly_data.csv'
 
-# # Initialize session state
+# Initialize session state
 if 'biweekly_data' not in st.session_state:
     if os.path.exists(CSV_FILE):
         data = pd.read_csv(CSV_FILE)
