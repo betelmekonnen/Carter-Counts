@@ -4,36 +4,28 @@ import os
 import json
 
 # File where biweekly data will be saved
-# File where biweekly data will be saved
-CSV_FILE = 'biweekly_data.csv'
-
-# Create an empty CSV file with the appropriate columns if it doesn't exist
-if not os.path.exists(CSV_FILE):
-    # Define the columns you want for the CSV file
-    empty_df = pd.DataFrame(columns=["income", "expenses", "extras"])
-    empty_df.to_csv(CSV_FILE, index=False)
 # CSV_FILE = 'biweekly_data.csv'
 
 # # Initialize session state
-# if 'biweekly_data' not in st.session_state:
-#     if os.path.exists(CSV_FILE):
-#         data = pd.read_csv(CSV_FILE)
-#         st.session_state.biweekly_data = data.to_dict(orient='records')
-#     else:
-#         st.session_state.biweekly_data = []
+if 'biweekly_data' not in st.session_state:
+    if os.path.exists(CSV_FILE):
+        data = pd.read_csv(CSV_FILE)
+        st.session_state.biweekly_data = data.to_dict(orient='records')
+    else:
+        st.session_state.biweekly_data = []
 
-# if 'current_period' not in st.session_state:
-#     st.session_state.current_period = {
-#         'income': {},
-#         'expenses': {},
-#         'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
-#     }
+if 'current_period' not in st.session_state:
+    st.session_state.current_period = {
+        'income': {},
+        'expenses': {},
+        'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
+    }
 
-# if 'delete_confirm' not in st.session_state:
-#     st.session_state.delete_confirm = None
+if 'delete_confirm' not in st.session_state:
+    st.session_state.delete_confirm = None
 
-# if 'edit_index' not in st.session_state:
-#     st.session_state.edit_index = None
+if 'edit_index' not in st.session_state:
+    st.session_state.edit_index = None
 
 # Title
 st.title("Carter Counts!")
