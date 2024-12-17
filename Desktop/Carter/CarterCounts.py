@@ -42,7 +42,8 @@ with col2:
     savings_percent = st.slider("Savings (%)", 0, 100, 10)
     tax_percent = st.slider("Tax (%)", 0, 100, 10)
 
-if biweekly_net > 0 and biweekly_deductions >= 0:
+# Calculate totals
+# if biweekly_net > 0 and biweekly_deductions >= 0:
     biweekly_total = biweekly_net - biweekly_deductions
     monthly_total = biweekly_total * 2
     post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
