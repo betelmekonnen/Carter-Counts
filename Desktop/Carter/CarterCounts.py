@@ -294,3 +294,6 @@ if st.button("Clear All Data"):
     if os.path.exists(CSV_FILE):
         os.remove(CSV_FILE)
     st.success("All data cleared successfully!", icon="✅")
+
+st.subheader("📝 Biweekly Expenses Summary")
+st.table(extras_df)
