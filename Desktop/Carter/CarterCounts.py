@@ -43,10 +43,14 @@ with col2:
     tax_percent = st.slider("Tax (%)", 0, 100, 10)
 
 # Calculate totals
-if biweekly_net > 0 and biweekly_deductions >= 0:
-    biweekly_total = biweekly_net - biweekly_deductions
-    monthly_total = biweekly_total * 2
-    post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+# if biweekly_net > 0 and biweekly_deductions >= 0:
+#     biweekly_total = biweekly_net - biweekly_deductions
+#     monthly_total = biweekly_total * 2
+#     post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+# Calculate total and post-savings/tax available funds
+biweekly_total = biweekly_net - biweekly_deductions
+monthly_total = biweekly_total * 2
+post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
 
     # Display totals
     st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
