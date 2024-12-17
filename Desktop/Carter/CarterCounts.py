@@ -47,10 +47,10 @@ biweekly_total = biweekly_net - biweekly_deductions
 monthly_total = biweekly_total * 2
 post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
 
-    # Display totals
-    st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
-    st.write(f"**Monthly Total**: ${monthly_total:.2f}")
-    st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
+ # Display totals
+ st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
+ st.write(f"**Monthly Total**: ${monthly_total:.2f}")
+ st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
 # Always save updated values to session state
 st.session_state.current_period['income'] = {
@@ -60,6 +60,10 @@ st.session_state.current_period['income'] = {
     'tax_percent': tax_percent,
     'post_tax_savings': post_tax_savings
 }
+
+# Debugging - Show Current Period Income to confirm
+st.subheader("Current Income State")
+st.write(st.session_state.current_period['income'])
 
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
