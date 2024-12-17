@@ -161,7 +161,23 @@ if st.button("Add Extra Expense"):
         'Description': new_description,
         'Amount': new_amount
     }
-    st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_expense, ignore_index=True)
+    
+    # Create a DataFrame for the new expense
+    new_expense_df = pd.DataFrame([new_expense])
+
+    # Concatenate the new row with the existing DataFrame
+    st.session_state.current_period['extras'] = pd.concat([st.session_state.current_period['extras'], new_expense_df], ignore_index=True)
+
+    st.success("Extra expense added successfully!")
+
+# if st.button("Add Extra Expense"):
+#     new_expense = {
+#         'Date': new_date,
+#         'Category': new_category,
+#         'Description': new_description,
+#         'Amount': new_amount
+#     }
+#     st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_expense, ignore_index=True)
 
 # Save and Edit Data
 if st.button("Save Period"):
