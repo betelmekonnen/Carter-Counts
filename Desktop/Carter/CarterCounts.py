@@ -51,6 +51,10 @@ st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
 st.write(f"**Monthly Total**: ${monthly_total:.2f}")
 st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
+# Savings breakdown visualization
+savings_amount = biweekly_total * (savings_percent / 100)
+st.write(f"**Savings at {savings_percent}%**: ${savings_amount:.2f}")
+st.write(f"**Remaining after Savings**: ${biweekly_total - savings_amount:.2f}")
 # Always save updated values to session state
 st.session_state.current_period['income'] = {
     'biweekly_net': biweekly_net,
@@ -60,9 +64,6 @@ st.session_state.current_period['income'] = {
     'post_tax_savings': post_tax_savings
 }
 
-# Debugging - Show Current Period Income to confirm
-st.subheader("Current Income State")
-st.write(st.session_state.current_period['income'])
 
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
