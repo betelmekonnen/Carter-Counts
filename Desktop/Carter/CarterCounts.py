@@ -61,10 +61,6 @@ st.session_state.current_period['income'] = {
     'post_tax_savings': post_tax_savings
 }
 
-# Debugging - Show Current Period Income to confirm
-st.subheader("Current Income State")
-st.write(st.session_state.current_period['income'])
-
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
 fixed_expenses = {
