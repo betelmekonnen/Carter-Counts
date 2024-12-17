@@ -68,6 +68,7 @@ st.header("📑 Fixed Monthly Expenses")
 fixed_expenses = {
     'Rent': st.number_input("Rent ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01, format="%.2f"),
+    'Car Insurance': st.number_input("Car Insurance ($)", min_value=0.0, step=0.01),
     'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
@@ -79,8 +80,9 @@ fixed_expenses = {
 }
 total_fixed_expenses = sum(fixed_expenses.values())
 st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
-if sum(fixed_expenses.values()) > 0:
-    st.write(f"**Total Fixed Expenses**: ${sum(fixed_expenses.values()):.2f}")
+
+# Save to session state if total > 0
+if total_fixed_expenses > 0:
     st.session_state.current_period['expenses'] = fixed_expenses
 else:
     st.warning("⚠️ Please enter at least one fixed expense.")
