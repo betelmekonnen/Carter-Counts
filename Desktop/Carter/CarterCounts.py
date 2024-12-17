@@ -271,14 +271,6 @@ if st.session_state.biweekly_data:
             extras_df = pd.DataFrame(extras_data)
         except (json.JSONDecodeError, TypeError):
             extras_df = pd.DataFrame()  # Empty DataFrame if parsing fails
-    
-        # # Handle extras
-        # if isinstance(period['extras'], list):
-        #     extras_df = pd.DataFrame(period['extras'])
-        # elif isinstance(period['extras'], str):
-        #     extras_df = pd.DataFrame(eval(period['extras']))  # Convert string to DataFrame
-        # else:
-        #     extras_df = period['extras']  # Assume already a DataFrame
 
         st.write("**Extras**")
         st.dataframe(extras_df)
