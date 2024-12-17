@@ -44,8 +44,14 @@ with col2:
 
 if biweekly_net > 0 and biweekly_deductions >= 0:
     biweekly_total = biweekly_net - biweekly_deductions
+    monthly_total = biweekly_total * 2
     post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+
+    # Display totals
+    st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
+    st.write(f"**Monthly Total**: ${monthly_total:.2f}")
     st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
+
 
     st.session_state.current_period['income'] = {
         'biweekly_net': biweekly_net,
