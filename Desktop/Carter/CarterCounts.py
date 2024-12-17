@@ -52,16 +52,18 @@ post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
     st.write(f"**Monthly Total**: ${monthly_total:.2f}")
     st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
+# Always save updated values to session state
+st.session_state.current_period['income'] = {
+    'biweekly_net': biweekly_net,
+    'biweekly_deductions': biweekly_deductions,
+    'savings_percent': savings_percent,
+    'tax_percent': tax_percent,
+    'post_tax_savings': post_tax_savings
+}
 
-    st.session_state.current_period['income'] = {
-        'biweekly_net': biweekly_net,
-        'biweekly_deductions': biweekly_deductions,
-        'savings_percent': savings_percent,
-        'tax_percent': tax_percent,
-        'post_tax_savings': post_tax_savings
-    }
-else:
-    st.warning("⚠️ Please enter valid Income details (Net Revenue and Deductions).")
+# Debugging - Show Current Period Income to confirm
+st.subheader("Current Income State")
+st.write(st.session_state.current_period['income'])
 
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
