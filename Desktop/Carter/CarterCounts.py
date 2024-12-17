@@ -38,8 +38,6 @@ if 'edit_index' not in st.session_state:
 # Title
 st.title("🧮Carter Counts!")
 
-# Export/Import Section
-st.subheader("📤 Export/📥 Import Data")
 
 # Export buttons
 col1, col2 = st.columns(2)
