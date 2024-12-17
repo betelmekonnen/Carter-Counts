@@ -1,40 +1,68 @@
 import streamlit as st
 import pandas as pd
-import json
 import os
+import json
 import xlsxwriter
+
+
+# File where biweekly data will be saved
+CSV_FILE = 'biweekly_data.csv'
+import os
+import pandas as pd
+import streamlit as st
 
 # File where biweekly data will be saved
 CSV_FILE = 'biweekly_data.csv'
 
-# Export button
-st.download_button(
-    label="Export as CSV🗂️",
-    data=pd.DataFrame(
-        [flatten_period(period) for period in st.session_state.biweekly_data]
-    ).to_csv(index=False).encode('utf-8'),
-    file_name="biweekly_data.csv",
-    mime="text/csv"
-)
+# Initialize session state
+if 'biweekly_data' not in st.session_state:
+    if os.path.exists(CSV_FILE):
+        data = pd.read_csv(CSV_FILE)
+        st.session_state.biweekly_data = data.to_dict(orient='records')
+    else:
+        st.session_state.biweekly_data = []
 
-# Function to flatten the period data
-def flatten_period(period):
-    # Parse JSON strings back to their original data types (if they were JSON strings)
-    income = json.loads(period['income'])
-    expenses = json.loads(period['expenses'])
-    extras = json.loads(period['extras'])
+if 'current_period' not in st.session_state:
+    st.session_state.current_period = {
+        'income': {},
+        'expenses': {},
+        'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
+    }
 
-    # Flatten income and expenses dictionaries
-    flattened_data = {**income, **expenses}
+if 'delete_confirm' not in st.session_state:
+    st.session_state.delete_confirm = None
 
-    # Flatten extras into a more readable format (convert to string if needed)
-    extras_data = "; ".join([f"{extra['Date']} - {extra['Category']}: {extra['Description']} (${extra['Amount']})"
-                             for extra in extras])
+if 'edit_index' not in st.session_state:
+    st.session_state.edit_index = None
 
-    # Add the flattened extras data
-    flattened_data['Extras'] = extras_data
+# Title
+st.title("Carter Counts🧮!")
 
-    return flattened_data
+# Export/Import Section
+st.subheader("📤 Export/📥 Import Data")
+
+# Export buttons
+col1, col2 = st.columns(2)
+with col1:
+    st.download_button(
+        label="Export as CSV🗂️",
+        data=pd.DataFrame(st.session_state.biweekly_data).to_csv(index=False).encode('utf-8'),
+        file_name="biweekly_data.csv",
+        mime="text/csv"
+    )
+with col2:
+    # Create an Excel file in memory for download
+    if st.session_state.biweekly_data:
+        df = pd.DataFrame(st.session_state.biweekly_data)
+        excel_buffer = pd.ExcelWriter("biweekly_data.xlsx", engine='xlsxwriter')
+        df.to_excel(excel_buffer, index=False, sheet_name='Data')
+        excel_buffer.close()
+        st.download_button(
+            label="Export as Excel🗂️",
+            data=open("biweekly_data.xlsx", "rb"),
+            file_name="biweekly_data.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 # Import file
 st.subheader("Import Data")
