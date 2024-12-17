@@ -126,9 +126,19 @@ if st.button("Save Period"):
             st.session_state.biweekly_data.append(current_period)
             st.success("New period saved!")
 
-        pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-        st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
+        # Save to CSV
+        try:
+            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+        except Exception as e:
+            st.error(f"Error saving data: {e}")
 
+        # Reset current period
+        st.session_state.current_period = {
+            'income': {}, 
+            'expenses': {}, 
+            'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
+        }
+        
 # # Show All Saved Periods
 # st.header("📆 All Biweekly Periods")
 # if st.session_state.biweekly_data:
