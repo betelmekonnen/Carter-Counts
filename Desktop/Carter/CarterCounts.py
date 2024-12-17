@@ -140,7 +140,7 @@ else:
     st.warning("⚠️ Please enter at least one fixed expense.")
 
 # Section: Extras
-st.header("🛒 Weekly Extras")
+st.header("🛒 Daily Expenses")
 with st.form("Add Expense"):
     date = st.date_input("Date")
     category = st.text_input("Category")
