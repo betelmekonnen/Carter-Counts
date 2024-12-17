@@ -232,7 +232,7 @@ if st.button("Save Period"):
     current_period = {
         'income': st.session_state.current_period['income'],
         'expenses': st.session_state.current_period['expenses'],
-        'extras': st.session_state.current_period['extras'].to_dict(orient='records')  # Convert dataframe to list of dicts
+        'extras': json.dumps(st.session_state.current_period['extras'].to_dict(orient='records'))
     }
     
     # Append to CSV file (if CSV exists, append; else, create new CSV)
