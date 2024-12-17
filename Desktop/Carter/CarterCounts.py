@@ -139,7 +139,7 @@ if total_fixed_expenses > 0:
 else:
     st.warning("⚠️ Please enter at least one fixed expense.")
 
-# Section: Extras
+# Section: Extras Expenses
 st.header("🛒 Daily Expenses")
 with st.form("Add Expense"):
     date = st.date_input("Date")
@@ -150,7 +150,7 @@ with st.form("Add Expense"):
 
     if add_expense:
         if not category or not description or amount <= 0:
-            st.error("⚠️ Please fill in all fields for Extras (Date, Category, Description, and Amount).")
+            st.error("⚠️ Please fill in all fields for Daily Expenses (Date, Category, Description, and Amount).")
         else:
             new_row = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
             st.session_state.current_period['extras'] = pd.concat(
@@ -159,7 +159,7 @@ with st.form("Add Expense"):
             )
             st.success("Expense added successfully!")
 
-st.subheader("Extras This Period")
+st.subheader("Daily Expenses This Period")
 st.dataframe(st.session_state.current_period['extras'])
 
 # Save Period with Validation
@@ -169,7 +169,7 @@ if st.button("Save Period"):
     extras = st.session_state.current_period['extras']
 
     if not income or not expenses or extras.empty:
-        st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.")
+        st.error("⚠️ Please ensure Income, Expenses, and at least one Daily expense are filled before saving.")
     else:
         # Ensure all columns in 'extras' are serializable
         # Convert the 'Date' column to string (ISO format)
@@ -255,7 +255,7 @@ if st.session_state.biweekly_data:
 
         st.write("**Income**", income)
         st.write("**Expenses**", expenses)
-        st.write("**Extras**")
+        st.write("**Daily Expenses**")
         st.dataframe(extras_df)
 
         col1, col2 = st.columns(2)
