@@ -136,7 +136,7 @@ st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 if total_fixed_expenses > 0:
     st.session_state.current_period['expenses'] = fixed_expenses
 else:
-    st.warning("⚠️ Please enter at least one fixed expense.",icon="⚠️")
+    st.warning("Please enter at least one fixed expense.",icon="⚠️")
 
 # Section: Extras Expenses
 st.header("🛒 Daily Expenses")
@@ -149,7 +149,7 @@ with st.form("Add Expense"):
 
     if add_expense:
         if not category or not description or amount <= 0:
-            st.error("⚠️ Please fill in all fields for Daily Expenses (Date, Category, Description, and Amount).", icon="🚨")
+            st.error("Please fill in all fields for Daily Expenses (Date, Category, Description, and Amount).", icon="🚨")
         else:
             new_row = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
             st.session_state.current_period['extras'] = pd.concat(
@@ -168,7 +168,7 @@ if st.button("Save Period"):
     extras = st.session_state.current_period['extras']
 
     if not income or not expenses or extras.empty:
-        st.error("⚠️ Please ensure Income, Expenses, and at least one Daily expense are filled before saving.", icon="🚨")
+        st.error("Please ensure Income, Expenses, and at least one Daily expense are filled before saving.", icon="🚨")
     else:
         # Ensure all columns in 'extras' are serializable
         # Convert the 'Date' column to string (ISO format)
