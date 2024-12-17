@@ -4,65 +4,70 @@ import os
 import json
 import xlsxwriter
 
-
-# File where biweekly data will be saved
-CSV_FILE = 'biweekly_data.csv'
-import os
-import pandas as pd
-import streamlit as st
-
 # File where biweekly data will be saved
 CSV_FILE = 'biweekly_data.csv'
 
-# Initialize session state
-if 'biweekly_data' not in st.session_state:
-    if os.path.exists(CSV_FILE):
-        data = pd.read_csv(CSV_FILE)
-        st.session_state.biweekly_data = data.to_dict(orient='records')
-    else:
-        st.session_state.biweekly_data = []
+# Export section (Flattened export format)
+st.subheader("📤 Export Data")
 
-if 'current_period' not in st.session_state:
-    st.session_state.current_period = {
-        'income': {},
-        'expenses': {},
-        'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
-    }
-
-if 'delete_confirm' not in st.session_state:
-    st.session_state.delete_confirm = None
-
-if 'edit_index' not in st.session_state:
-    st.session_state.edit_index = None
-
-# Title
-st.title("Carter Counts🧮!")
-
-# Export/Import Section
-st.subheader("📤 Export/📥 Import Data")
-
-# Export buttons
 col1, col2 = st.columns(2)
 with col1:
     st.download_button(
         label="Export as CSV🗂️",
-        data=pd.DataFrame(st.session_state.biweekly_data).to_csv(index=False).encode('utf-8'),
+        data=pd.DataFrame(st.session_state.biweekly_data).apply(pd.Series).to_csv(index=False).encode('utf-8'),
         file_name="biweekly_data.csv",
         mime="text/csv"
     )
+
 with col2:
-    # Create an Excel file in memory for download
     if st.session_state.biweekly_data:
         df = pd.DataFrame(st.session_state.biweekly_data)
+        
+        # Flatten the 'income' and 'expenses' JSON fields into individual columns
+        df['biweekly_net'] = df['income'].apply(lambda x: json.loads(x)['biweekly_net'] if isinstance(x, str) else x['biweekly_net'])
+        df['biweekly_deductions'] = df['income'].apply(lambda x: json.loads(x)['biweekly_deductions'] if isinstance(x, str) else x['biweekly_deductions'])
+        df['savings_percent'] = df['income'].apply(lambda x: json.loads(x)['savings_percent'] if isinstance(x, str) else x['savings_percent'])
+        df['post_savings_funds'] = df['income'].apply(lambda x: json.loads(x)['post_savings_funds'] if isinstance(x, str) else x['post_savings_funds'])
+
+        df['Rent'] = df['expenses'].apply(lambda x: json.loads(x)['Rent'] if isinstance(x, str) else x['Rent'])
+        df['Car Payment'] = df['expenses'].apply(lambda x: json.loads(x)['Car Payment'] if isinstance(x, str) else x['Car Payment'])
+        df['Car Insurance'] = df['expenses'].apply(lambda x: json.loads(x)['Car Insurance'] if isinstance(x, str) else x['Car Insurance'])
+        df['Utilities'] = df['expenses'].apply(lambda x: json.loads(x)['Utilities'] if isinstance(x, str) else x['Utilities'])
+        df['Subscriptions'] = df['expenses'].apply(lambda x: json.loads(x)['Subscriptions'] if isinstance(x, str) else x['Subscriptions'])
+        df['Gym'] = df['expenses'].apply(lambda x: json.loads(x)['Gym'] if isinstance(x, str) else x['Gym'])
+        df['Groceries'] = df['expenses'].apply(lambda x: json.loads(x)['Groceries'] if isinstance(x, str) else x['Groceries'])
+        df['Renters Insurance'] = df['expenses'].apply(lambda x: json.loads(x)['Renters Insurance'] if isinstance(x, str) else x['Renters Insurance'])
+        df['Internet'] = df['expenses'].apply(lambda x: json.loads(x)['Internet'] if isinstance(x, str) else x['Internet'])
+        df['Electricity'] = df['expenses'].apply(lambda x: json.loads(x)['Electricity'] if isinstance(x, str) else x['Electricity'])
+
+        # Now let's flatten the 'extras' field (daily expenses) into a separate row for each expense
+        extras_df_list = []
+        for idx, row in df.iterrows():
+            # Convert 'extras' field (list of dicts) into a DataFrame
+            extras = json.loads(row['extras']) if isinstance(row['extras'], str) else row['extras']
+            if extras:
+                for expense in extras:
+                    flat_expense = row[['biweekly_net', 'biweekly_deductions', 'savings_percent', 'post_savings_funds',
+                                        'Rent', 'Car Payment', 'Car Insurance', 'Utilities', 'Subscriptions', 'Gym',
+                                        'Groceries', 'Renters Insurance', 'Internet', 'Electricity']].to_dict()
+                    flat_expense.update(expense)
+                    extras_df_list.append(flat_expense)
+        
+        # Create a new DataFrame from the flattened expenses
+        flattened_extras_df = pd.DataFrame(extras_df_list)
+        
+        # Export this new flattened DataFrame as Excel
         excel_buffer = pd.ExcelWriter("biweekly_data.xlsx", engine='xlsxwriter')
-        df.to_excel(excel_buffer, index=False, sheet_name='Data')
+        flattened_extras_df.to_excel(excel_buffer, index=False, sheet_name='Data')
         excel_buffer.close()
+
         st.download_button(
             label="Export as Excel🗂️",
             data=open("biweekly_data.xlsx", "rb"),
             file_name="biweekly_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
 
 # Import file
 st.subheader("Import Data")
