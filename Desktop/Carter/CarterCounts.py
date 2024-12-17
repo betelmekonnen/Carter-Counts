@@ -42,9 +42,15 @@ with col2:
     savings_percent = st.slider("Savings (%)", 0, 100, 10)
     tax_percent = st.slider("Tax (%)", 0, 100, 10)
 
+# Calculate totals
 if biweekly_net > 0 and biweekly_deductions >= 0:
     biweekly_total = biweekly_net - biweekly_deductions
+    monthly_total = biweekly_total * 2
     post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+    
+    # Display totals
+    st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
+    st.write(f"**Monthly Total**: ${monthly_total:.2f}")
     st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
     st.session_state.current_period['income'] = {
@@ -120,47 +126,4 @@ if st.button("Save Period"):
             st.success("New period saved!")
 
         pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-        st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
-
-# Show All Saved Periods
-st.header("📆 All Biweekly Periods")
-if st.session_state.biweekly_data:
-    for i, period in enumerate(st.session_state.biweekly_data):
-        st.subheader(f"Biweekly Period {i + 1}")
-        st.write("**Income**", json.loads(period['income']))
-        st.write("**Expenses**", json.loads(period['expenses']))
-        st.write("**Extras**")
-        extras_df = pd.DataFrame(json.loads(period['extras']))
-        st.dataframe(extras_df)
-
-        # Edit and Delete Buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button(f"Edit Period {i + 1}", key=f"edit_{i}"):
-                st.session_state.current_period = {
-                    'income': json.loads(period['income']),
-                    'expenses': json.loads(period['expenses']),
-                    'extras': pd.DataFrame(json.loads(period['extras']))
-                }
-                st.session_state.edit_index = i
-                st.experimental_rerun()
-        with col2:
-            if st.button(f"Delete Period {i + 1}", key=f"delete_{i}"):
-                st.session_state.delete_confirm = i
-                st.experimental_rerun()
-
-# Confirmation Dialog for Deletion
-if st.session_state.delete_confirm is not None:
-    st.warning("Are you sure you want to delete this period?")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Yes, Delete"):
-            st.session_state.biweekly_data.pop(st.session_state.delete_confirm)
-            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
-            st.session_state.delete_confirm = None
-            st.success("Period deleted successfully!")
-            st.experimental_rerun()
-    with col2:
-        if st.button("Cancel"):
-            st.session_state.delete_confirm = None
-            st.experimental_rerun()
+        st.session_state.current_period = {'income': {}, 'expenses':
