@@ -47,10 +47,9 @@ biweekly_total = biweekly_net - biweekly_deductions
 monthly_total = biweekly_total * 2
 post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
 
- # Display totals
- st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
- st.write(f"**Monthly Total**: ${monthly_total:.2f}")
- st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
+st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
+st.write(f"**Monthly Total**: ${monthly_total:.2f}")
+st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
 # Always save updated values to session state
 st.session_state.current_period['income'] = {
@@ -140,33 +139,6 @@ if st.button("Save Period"):
             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
         }
         
-# # Show All Saved Periods
-# st.header("📆 All Biweekly Periods")
-# if st.session_state.biweekly_data:
-#     for i, period in enumerate(st.session_state.biweekly_data):
-#         st.subheader(f"Biweekly Period {i + 1}")
-#         st.write("**Income**", json.loads(period['income']))
-#         st.write("**Expenses**", json.loads(period['expenses']))
-#         st.write("**Extras**")
-#         extras_df = pd.DataFrame(json.loads(period['extras']))
-#         st.dataframe(extras_df)
-
-#         # Edit and Delete Buttons
-#         col1, col2 = st.columns(2)
-#         with col1:
-#             if st.button(f"Edit Period {i + 1}", key=f"edit_{i}"):
-#                 st.session_state.current_period = {
-#                     'income': json.loads(period['income']),
-#                     'expenses': json.loads(period['expenses']),
-#                     'extras': pd.DataFrame(json.loads(period['extras']))
-#                 }
-#                 st.session_state.edit_index = i
-#                 st.experimental_rerun()
-#         with col2:
-#             if st.button(f"Delete Period {i + 1}", key=f"delete_{i}"):
-#                 st.session_state.delete_confirm = i
-#                 st.experimental_rerun()
-# Show All Saved Periods
 st.header("📆 All Biweekly Periods")
 if st.session_state.biweekly_data:
     for i, period in enumerate(st.session_state.biweekly_data):
