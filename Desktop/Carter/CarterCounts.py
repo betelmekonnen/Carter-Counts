@@ -188,12 +188,22 @@ if st.session_state.delete_confirm is not None:
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Yes, Delete"):
+            # Delete the selected period
             st.session_state.biweekly_data.pop(st.session_state.delete_confirm)
-            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+            
+            # Update CSV file
+            try:
+                pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+                st.success("Period deleted successfully!")
+            except Exception as e:
+                st.error(f"Error saving data: {e}")
+
+            # Reset delete_confirm state
             st.session_state.delete_confirm = None
-            st.success("Period deleted successfully!")
-            st.experimental_rerun()
+            
+            # No need to rerun explicitly, Streamlit will re-render
     with col2:
         if st.button("Cancel"):
+            # Reset delete_confirm state
             st.session_state.delete_confirm = None
-            st.experimental_rerun()
+
