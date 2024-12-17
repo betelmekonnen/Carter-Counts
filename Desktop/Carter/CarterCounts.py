@@ -45,7 +45,7 @@ st.subheader("📤 Export/📥 Import Data")
 col1, col2 = st.columns(2)
 with col1:
     st.download_button(
-        label="Export as CSV",
+        label="Export as CSV🗂️",
         data=pd.DataFrame(st.session_state.biweekly_data).to_csv(index=False).encode('utf-8'),
         file_name="biweekly_data.csv",
         mime="text/csv"
@@ -58,7 +58,7 @@ with col2:
         df.to_excel(excel_buffer, index=False, sheet_name='Data')
         excel_buffer.close()
         st.download_button(
-            label="Export as Excel",
+            label="Export as Excel🗂️",
             data=open("biweekly_data.xlsx", "rb"),
             file_name="biweekly_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
