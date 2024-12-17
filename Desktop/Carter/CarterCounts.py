@@ -8,14 +8,24 @@ CSV_FILE = 'biweekly_data.csv'
 
 # Initialize session state
 if 'biweekly_data' not in st.session_state:
-# Check if the CSV file exists and load it
     if os.path.exists(CSV_FILE):
-        st.session_state.biweekly_data = pd.read_csv(CSV_FILE).to_dict(orient='records')  # Load saved data into session_state
+        data = pd.read_csv(CSV_FILE)
+        st.session_state.biweekly_data = data.to_dict(orient='records')
     else:
         st.session_state.biweekly_data = []
 
 if 'current_period' not in st.session_state:
-    st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
+    st.session_state.current_period = {
+        'income': {},
+        'expenses': {},
+        'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
+    }
+
+if 'delete_confirm' not in st.session_state:
+    st.session_state.delete_confirm = None
+
+if 'edit_index' not in st.session_state:
+    st.session_state.edit_index = None
 
 # Title
 st.title("Carter Counts!")
@@ -25,252 +35,132 @@ st.header("💰 Income Details")
 col1, col2 = st.columns(2)
 
 with col1:
-    biweekly_net = st.number_input("Biweekly Net Revenue ($)", min_value=0.0, step=0.01)
-    biweekly_deductions = st.number_input("Biweekly Deductions ($)", min_value=0.0, step=0.01)
+    biweekly_net = st.number_input("Biweekly Net Revenue ($)", min_value=0.0, step=0.01, format="%.2f")
+    biweekly_deductions = st.number_input("Biweekly Deductions ($)", min_value=0.0, step=0.01, format="%.2f")
 
 with col2:
     savings_percent = st.slider("Savings (%)", 0, 100, 10)
     tax_percent = st.slider("Tax (%)", 0, 100, 10)
 
-# Calculate total and post-savings/tax available funds
-biweekly_total = biweekly_net - biweekly_deductions
-monthly_total = biweekly_total * 2
-post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+if biweekly_net > 0 and biweekly_deductions >= 0:
+    biweekly_total = biweekly_net - biweekly_deductions
+    post_tax_savings = biweekly_total * (1 - (savings_percent + tax_percent) / 100)
+    st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
 
-st.write(f"**Biweekly Total**: ${biweekly_total:.2f}")
-st.write(f"**Monthly Total**: ${monthly_total:.2f}")
-st.write(f"**Available Funds after Savings & Taxes**: ${post_tax_savings:.2f}")
-
-# Savings breakdown visualization
-savings_amount = biweekly_total * (savings_percent / 100)
-st.write(f"**Savings at {savings_percent}%**: ${savings_amount:.2f}")
-st.write(f"**Remaining after Savings**: ${biweekly_total - savings_amount:.2f}")
-
-# Save Income Details
-st.session_state.current_period['income'] = {
-    'biweekly_net': biweekly_net,
-    'biweekly_deductions': biweekly_deductions,
-    'savings_percent': savings_percent,
-    'tax_percent': tax_percent,
-    'post_tax_savings': post_tax_savings
-}
+    st.session_state.current_period['income'] = {
+        'biweekly_net': biweekly_net,
+        'biweekly_deductions': biweekly_deductions,
+        'savings_percent': savings_percent,
+        'tax_percent': tax_percent,
+        'post_tax_savings': post_tax_savings
+    }
+else:
+    st.warning("⚠️ Please enter valid Income details (Net Revenue and Deductions).")
 
 # Section: Fixed Expenses
 st.header("📑 Fixed Monthly Expenses")
 fixed_expenses = {
-    'Rent': st.number_input("Rent ($)", min_value=0.0, step=0.01),
-    'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01),
-    'Car Insurance': st.number_input("Car Insurance ($)", min_value=0.0, step=0.01),  # Added Car Insurance
-    'Fidelity': st.number_input("Fidelity ($)", min_value=0.0, step=0.01),  # Added Fidelity
-    'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01),
-    'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
-    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),  # Added Groceries
-    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
-    'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
-    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
-    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01)
+    'Rent': st.number_input("Rent ($)", min_value=0.0, step=0.01, format="%.2f"),
+    'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01, format="%.2f"),
+    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01, format="%.2f"),
+    'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01, format="%.2f"),
+    'Misc': st.number_input("Misc ($)", min_value=0.0, step=0.01, format="%.2f")
 }
-total_fixed_expenses = sum(fixed_expenses.values())
-st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 
-# Save Expenses
-st.session_state.current_period['expenses'] = fixed_expenses
+if sum(fixed_expenses.values()) > 0:
+    st.write(f"**Total Fixed Expenses**: ${sum(fixed_expenses.values()):.2f}")
+    st.session_state.current_period['expenses'] = fixed_expenses
+else:
+    st.warning("⚠️ Please enter at least one fixed expense.")
 
-# Section: Disposable Income Calculation
-remaining_after_savings = biweekly_total - savings_amount  # Remaining after savings (biweekly)
-monthly_remaining_after_savings = remaining_after_savings * 2  # Convert to monthly
-disposable_income_monthly = monthly_remaining_after_savings - total_fixed_expenses  # Subtract fixed expenses
-disposable_income_biweekly = disposable_income_monthly / 2  # Divide by 2 for biweekly
-
-# Display Results
-st.write(f"**Remaining after Savings (Biweekly):** ${remaining_after_savings:.2f}")
-st.write(f"**Monthly Disposable Income after Expenses:** ${disposable_income_monthly:.2f}")
-st.write(f"**Biweekly Disposable Income:** ${disposable_income_biweekly:.2f}")
-
-
-# Section: Extras and Weekly Spending
+# Section: Extras
 st.header("🛒 Weekly Extras")
-
-
-# Add Extra Income (Optional)
-with st.form("add_extra_income"):
-    extra_income = st.number_input("Extra Income ($)", min_value=0.0, step=0.01)
-    submit_extra_income = st.form_submit_button("Add Extra Income")  # Submit button for extra income
-    
-    if submit_extra_income:
-        st.session_state.current_period['extra_income'] = extra_income  # Save extra income
-        
-# Show extra income if provided
-if 'extra_income' in st.session_state.current_period:
-    st.write(f"**Extra Income Added**: ${st.session_state.current_period['extra_income']:.2f}")
-
-
-# Add Custom Categories Section
-st.header("Add Custom Categories")
-
-# Initialize session state for custom categories if it doesn't exist yet
-if 'custom_categories' not in st.session_state:
-    st.session_state.custom_categories = []
-
-# Input field for a new category
-new_category = st.text_input("New Category", key="new_category_input")
-
-# Button to add the new category to the list
-if st.button("Add Category", key="add_category_button"):
-    if new_category and new_category not in st.session_state.custom_categories:
-        st.session_state.custom_categories.append(new_category)
-        st.success(f"Category '{new_category}' added!")
-        st.experimental_rerun()
-    elif new_category in st.session_state.custom_categories:
-        st.warning("Category already exists.")
-
-# Show the list of custom categories
-st.subheader("Current Custom Categories")
-if st.session_state.custom_categories:
-    # Display the custom categories with delete option
-    for category in st.session_state.custom_categories:
-        category_row = st.container()
-        with category_row:
-            col1, col2 = st.columns([4, 1])
-            col1.write(category)
-            # Button to delete the category
-            if col2.button(f"Delete {category}", key=f"delete_{category}"):
-                st.session_state.custom_categories.remove(category)
-                st.success(f"Category '{category}' removed!")
-                st.experimental_rerun()
-                break  # Re-run the loop to update the list immediately
-
-# Add expense using custom categories
-st.header("Add Expense")
 with st.form("Add Expense"):
     date = st.date_input("Date")
-    
-    # Combine predefined categories with custom categories
-    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-    
-    # Category selection (dropdown)
-    category = st.selectbox("Category", all_categories)
+    category = st.text_input("Category")
     description = st.text_input("Description")
-    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
+    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01, format="%.2f")
     add_expense = st.form_submit_button("Add Expense")
-    
+
     if add_expense:
-        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        # Assuming you're appending the expense to the session_state's extras dataframe
-        new_row = pd.DataFrame([new_entry])  # Convert the new entry into a DataFrame
-        st.session_state.current_period['extras'] = pd.concat(
-            [st.session_state.current_period['extras'], new_row],
-            ignore_index=True
-        )
-        st.success("Expense added successfully!")
+        if not category or not description or amount <= 0:
+            st.error("⚠️ Please fill in all fields for Extras (Date, Category, Description, and Amount).")
+        else:
+            new_row = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
+            st.session_state.current_period['extras'] = pd.concat(
+                [st.session_state.current_period['extras'], pd.DataFrame([new_row])],
+                ignore_index=True
+            )
+            st.success("Expense added successfully!")
 
-
-# Show the expense table with extras
 st.subheader("Extras This Period")
-extras_df = st.session_state.current_period['extras']
-st.dataframe(extras_df)
-
-# First Add Expense Form
-with st.form("Add Expense 1"):  # Use a unique form key
-    date = st.date_input("Date")
-    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-    category = st.selectbox("Category", all_categories)
-    description = st.text_input("Description")
-    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
-    add_expense = st.form_submit_button("Add Expense")
-    
-    if add_expense:
-        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        new_row = pd.DataFrame([new_entry])
-        st.session_state.current_period['extras'] = pd.concat(
-            [st.session_state.current_period['extras'], new_row],
-            ignore_index=True
-        )
-        st.success("Expense added successfully!")
-# Second Add Expense Form (if necessary)
-with st.form("Add Expense 2"):  # Use a different unique form key
-    date = st.date_input("Date")
-    all_categories = ["Outing", "Gift", "Drinks", "Misc"] + st.session_state.custom_categories
-    category = st.selectbox("Category", all_categories)
-    description = st.text_input("Description")
-    amount = st.number_input("Amount ($)", min_value=0.0, step=0.01)
-    add_expense = st.form_submit_button("Add Expense")
-    
-    if add_expense:
-        new_entry = {'Date': date, 'Category': category, 'Description': description, 'Amount': amount}
-        st.session_state.current_period['extras'] = st.session_state.current_period['extras'].append(new_entry, ignore_index=True)
-
-
-# Show expense table
-st.subheader("Extras This Period")
-extras_df = st.session_state.current_period['extras']
-st.dataframe(extras_df)
-
-
-# Show expense table
-st.subheader("Extras This Period")
-extras_df = st.session_state.current_period['extras']
-st.dataframe(extras_df)
-
-# Calculate totals for extras
-total_extras = extras_df['Amount'].sum()
-st.write(f"**Total Extras Spending**: ${total_extras:.2f}")
-
-# Biweekly Limit Check
-biweekly_limit = st.number_input("Set Biweekly Extras Limit ($)", min_value=0.0, step=0.01, value=200.0)
-remaining_after_expenses = post_tax_savings - total_fixed_expenses - total_extras
-st.write(f"**Remaining Funds after Expenses & Extras**: ${remaining_after_expenses:.2f}")
-
-if total_extras > biweekly_limit:
-    st.error(f"⚠️ You've exceeded your biweekly limit by ${total_extras - biweekly_limit:.2f}")
-else:
-    st.success(f"🎉 You're under your limit by ${biweekly_limit - total_extras:.2f}")
+st.dataframe(st.session_state.current_period['extras'])
 
 # Save Period
 if st.button("Save Period"):
-    # Save the current period to CSV file
-    current_period = {
-        'income': st.session_state.current_period['income'],
-        'expenses': st.session_state.current_period['expenses'],
-        'extras': json.dumps(st.session_state.current_period['extras'].to_dict(orient='records'))
-    }
-    
-    # Append to CSV file (if CSV exists, append; else, create new CSV)
-    current_data = pd.read_csv(CSV_FILE) if os.path.exists(CSV_FILE) else pd.DataFrame()
-    new_row = pd.DataFrame([current_period])  # Convert current_period into a DataFrame
-    current_data = pd.concat([current_data, new_row], ignore_index=True)
-    current_data.to_csv(CSV_FILE, index=False)
-    
-    # Reset current period
-    st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
-    st.success("Biweekly period saved!")
+    income = st.session_state.current_period['income']
+    expenses = st.session_state.current_period['expenses']
+    extras = st.session_state.current_period['extras']
 
+    if not income or not expenses or extras.empty:
+        st.error("⚠️ Please ensure Income, Expenses, and at least one Extra expense are filled before saving.")
+    else:
+        current_period = {
+            'income': json.dumps(income),
+            'expenses': json.dumps(expenses),
+            'extras': json.dumps(extras.to_dict(orient='records'))
+        }
 
-# # Show all saved periods
-# st.header("📆 All Biweekly Periods")
-# if st.session_state.biweekly_data:
-#     for i, period in enumerate(st.session_state.biweekly_data):
-#         st.subheader(f"Biweekly Period {i + 1}")
-#         st.write("**Income**", period['income'])
-#         st.write("**Expenses**", period['expenses'])
-#         st.write("**Extras**")
-#         st.dataframe(period['extras'])
+        if st.session_state.edit_index is not None:  # Editing existing period
+            st.session_state.biweekly_data[st.session_state.edit_index] = current_period
+            st.session_state.edit_index = None
+            st.success("Period updated successfully!")
+        else:  # Adding new period
+            st.session_state.biweekly_data.append(current_period)
+            st.success("New period saved!")
 
+        pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+        st.session_state.current_period = {'income': {}, 'expenses': {}, 'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])}
 
-# Show all saved periods
+# Show All Saved Periods
 st.header("📆 All Biweekly Periods")
 if st.session_state.biweekly_data:
     for i, period in enumerate(st.session_state.biweekly_data):
         st.subheader(f"Biweekly Period {i + 1}")
-        st.write("**Income**", period['income'])
-        st.write("**Expenses**", period['expenses'])
-        
-        # Handle extras
-        try:
-            extras_data = json.loads(period['extras'])  # Safely parse JSON
-            extras_df = pd.DataFrame(extras_data)
-        except (json.JSONDecodeError, TypeError):
-            extras_df = pd.DataFrame()  # Empty DataFrame if parsing fails
-
+        st.write("**Income**", json.loads(period['income']))
+        st.write("**Expenses**", json.loads(period['expenses']))
         st.write("**Extras**")
+        extras_df = pd.DataFrame(json.loads(period['extras']))
         st.dataframe(extras_df)
+
+        # Edit and Delete Buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button(f"Edit Period {i + 1}", key=f"edit_{i}"):
+                st.session_state.current_period = {
+                    'income': json.loads(period['income']),
+                    'expenses': json.loads(period['expenses']),
+                    'extras': pd.DataFrame(json.loads(period['extras']))
+                }
+                st.session_state.edit_index = i
+                st.experimental_rerun()
+        with col2:
+            if st.button(f"Delete Period {i + 1}", key=f"delete_{i}"):
+                st.session_state.delete_confirm = i
+                st.experimental_rerun()
+
+# Confirmation Dialog for Deletion
+if st.session_state.delete_confirm is not None:
+    st.warning("Are you sure you want to delete this period?")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Yes, Delete"):
+            st.session_state.biweekly_data.pop(st.session_state.delete_confirm)
+            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+            st.session_state.delete_confirm = None
+            st.success("Period deleted successfully!")
+            st.experimental_rerun()
+    with col2:
+        if st.button("Cancel"):
+            st.session_state.delete_confirm = None
+            st.experimental_rerun()
