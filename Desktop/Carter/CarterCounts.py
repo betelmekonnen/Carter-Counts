@@ -70,9 +70,15 @@ fixed_expenses = {
     'Car Payment': st.number_input("Car Payment ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01, format="%.2f"),
-    'Misc': st.number_input("Misc ($)", min_value=0.0, step=0.01, format="%.2f")
+    'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
+    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),  # Added Groceries
+    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
+    'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
+    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
+    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01)
 }
-
+total_fixed_expenses = sum(fixed_expenses.values())
+st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 if sum(fixed_expenses.values()) > 0:
     st.write(f"**Total Fixed Expenses**: ${sum(fixed_expenses.values()):.2f}")
     st.session_state.current_period['expenses'] = fixed_expenses
