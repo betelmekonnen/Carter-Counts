@@ -85,20 +85,15 @@ if uploaded_file is not None:
         st.error(f"Error importing data: {e}")
 
 # Section: Income Input
-# st.header("💰 Income Details")
-# col1, col2 = st.columns(2)
-# with col1:
-#     biweekly_net = st.number_input("Biweekly Net Revenue ($)", min_value=0.0, step=0.01, format="%.2f")
-#     biweekly_deductions = st.number_input("Biweekly Deductions ($)", min_value=0.0, step=0.01, format="%.2f")
-# with col2:
-#     savings_percent = st.slider("Savings (%)", 0, 100, 10)
-with st.expander("💰 Income Details"):
-    col1, col2 = st.columns(2)
-    with col1:
-        biweekly_net = st.number_input("Biweekly Net Revenue ($)", min_value=0.0, step=0.01, format="%.2f")
-        biweekly_deductions = st.number_input("Biweekly Deductions ($)", min_value=0.0, step=0.01, format="%.2f")
-    with col2:
-        savings_percent = st.slider("Savings (%)", 0, 100, 10)
+st.header("💰 Income Details")
+col1, col2 = st.columns(2)
+with col1:
+    biweekly_net = st.number_input("Biweekly Net Revenue ($)", min_value=0.0, step=0.01, format="%.2f")
+    biweekly_deductions = st.number_input("Biweekly Deductions ($)", min_value=0.0, step=0.01, format="%.2f")
+with col2:
+    savings_percent = st.slider("Savings (%)", 0, 100, 10)
+
+
 # Calculate totals
 biweekly_total = biweekly_net - biweekly_deductions
 monthly_total = biweekly_total * 2
