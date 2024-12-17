@@ -30,6 +30,52 @@ if 'edit_index' not in st.session_state:
 # Title
 st.title("Carter Counts!")
 
+# Export/Import Section
+st.header("📤 Export/📥 Import Data")
+
+# Export buttons
+col1, col2 = st.columns(2)
+with col1:
+    st.download_button(
+        label="Export as CSV",
+        data=pd.DataFrame(st.session_state.biweekly_data).to_csv(index=False).encode('utf-8'),
+        file_name="biweekly_data.csv",
+        mime="text/csv"
+    )
+with col2:
+    # Create an Excel file in memory for download
+    if st.session_state.biweekly_data:
+        df = pd.DataFrame(st.session_state.biweekly_data)
+        excel_buffer = pd.ExcelWriter("biweekly_data.xlsx", engine='xlsxwriter')
+        df.to_excel(excel_buffer, index=False, sheet_name='Data')
+        excel_buffer.close()
+        st.download_button(
+            label="Export as Excel",
+            data=open("biweekly_data.xlsx", "rb"),
+            file_name="biweekly_data.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+# Import file
+st.subheader("Import Data")
+uploaded_file = st.file_uploader("Upload a CSV or Excel file to import data", type=["csv", "xlsx"])
+
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            imported_data = pd.read_csv(uploaded_file).to_dict(orient='records')
+        elif uploaded_file.name.endswith('.xlsx'):
+            imported_data = pd.read_excel(uploaded_file).to_dict(orient='records')
+        else:
+            st.error("Unsupported file format. Please upload a CSV or Excel file.")
+
+        if imported_data:
+            st.session_state.biweekly_data.extend(imported_data)
+            pd.DataFrame(st.session_state.biweekly_data).to_csv(CSV_FILE, index=False)
+            st.success("Data imported successfully!")
+    except Exception as e:
+        st.error(f"Error importing data: {e}")
+
 # Section: Income Input
 st.header("💰 Income Details")
 col1, col2 = st.columns(2)
@@ -72,15 +118,14 @@ fixed_expenses = {
     'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Subscriptions': st.number_input("Subscriptions ($)", min_value=0.0, step=0.01, format="%.2f"),
     'Gym': st.number_input("Gym ($)", min_value=0.0, step=0.01),
-    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),  # Added Groceries
-    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
+    'Groceries': st.number_input("Groceries ($)", min_value=0.0, step=0.01),
+    'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),
     'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
-    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
+    'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),
 }
 total_fixed_expenses = sum(fixed_expenses.values())
 st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
 
-# Save to session state if total > 0
 if total_fixed_expenses > 0:
     st.session_state.current_period['expenses'] = fixed_expenses
 else:
