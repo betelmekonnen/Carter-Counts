@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 import json
+import xlsxwriter
+
 
 # File where biweekly data will be saved
 CSV_FILE = 'biweekly_data.csv'
