@@ -76,7 +76,6 @@ fixed_expenses = {
     'Renters Insurance': st.number_input("Renters Insurance ($)", min_value=0.0, step=0.01),  # Added Renters Insurance
     'Internet': st.number_input("Internet ($)", min_value=0.0, step=0.01),
     'Electricity': st.number_input("Electricity ($)", min_value=0.0, step=0.01),  # Added Electricity
-    'Utilities': st.number_input("Utilities ($)", min_value=0.0, step=0.01)
 }
 total_fixed_expenses = sum(fixed_expenses.values())
 st.write(f"**Total Fixed Expenses**: ${total_fixed_expenses:.2f}")
