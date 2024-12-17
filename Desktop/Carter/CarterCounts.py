@@ -115,7 +115,7 @@ if st.button("Save Period"):
         current_period = {
             'income': json.dumps(income),
             'expenses': json.dumps(expenses),
-            'extras': json.dumps(extras.to_dict(orient='records'))
+            'extras': json.dumps(extras.astype(str).to_dict(orient='records'))
         }
 
         if st.session_state.edit_index is not None:  # Editing existing period
