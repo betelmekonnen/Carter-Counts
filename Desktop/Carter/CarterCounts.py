@@ -30,14 +30,6 @@ if 'edit_index' not in st.session_state:
 # Title
 st.title("Carter Counts!")
 
-# Clear All Data Section
-st.write("Reset All Data")
-if st.button("Clear All Data"):
-    st.session_state.biweekly_data = []
-    if os.path.exists(CSV_FILE):
-        os.remove(CSV_FILE)
-    st.success("All data cleared successfully!")
-
 # Section: Income Input
 st.header("💰 Income Details")
 col1, col2 = st.columns(2)
@@ -152,6 +144,13 @@ if st.button("Save Period"):
             'expenses': {}, 
             'extras': pd.DataFrame(columns=['Date', 'Category', 'Description', 'Amount'])
         }
+# Clear All Data Section
+st.write("Reset All Data")
+if st.button("Clear All Data"):
+    st.session_state.biweekly_data = []
+    if os.path.exists(CSV_FILE):
+        os.remove(CSV_FILE)
+    st.success("All data cleared successfully!")
 
 # Show All Saved Periods
 st.header("📆 All Biweekly Periods")
